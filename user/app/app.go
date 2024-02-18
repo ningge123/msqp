@@ -3,8 +3,8 @@ package app
 import (
 	"context"
 	"google.golang.org/grpc"
-	"log"
 	"msqp/common/config"
+	"msqp/common/logs"
 	"net"
 	"os"
 	"os/signal"
@@ -12,6 +12,8 @@ import (
 )
 
 func Run(ctx context.Context) error {
+	logs.Init(config.Conf.AppName)
+
 	server := grpc.NewServer()
 	go func() {
 		listen, err := net.Listen("tcp", config.Conf.Grpc.Addr)
@@ -40,11 +42,11 @@ func Run(ctx context.Context) error {
 			switch s {
 			case syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT:
 				stop()
-				log.Println("user app quit")
+				logs.Info("user app quit")
 				return nil
 			case syscall.SIGHUP:
 				stop()
-				log.Println("user app quit")
+				logs.Info("user app quit")
 				return nil
 			default:
 				return nil
